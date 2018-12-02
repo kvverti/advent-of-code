@@ -1,0 +1,43 @@
+@import stream
+@import string using _
+@import hof using joining
+
+' Generates a vect of character sequence.
+def genLists(input) => input splitOn " \n"
+
+' Records whether some character appears twice or thrice in a string.
+' Returns a vect of `{ twice?, thrice? }`.
+(def letterInfo(str, idx, info)
+    => info fold ({ 0, 0 }, def(ac, k, v) => { (v = 2) ?: (1, ac(0)), (v = 3) ?: (1, ac(1)) }) ; idx = len(str)
+    => letterInfo(str, idx + 1, info ++ { str(idx) => info(str(idx)) + 1 }) ; str(idx) in info
+    => letterInfo(str, idx + 1, info ++ { str(idx) => 1 }) ; 1
+)
+
+' Generates the checksum for the given vect of strings.
+(def checksum(lists) =>
+    lists map (def(a) => letterInfo(a, 0, Unit))
+    reduce (def(ac, el) => { ac(0) + el(0), ac(1) + el(1) })
+    reduce \*\
+)
+
+' Determines whether two strings are one character off.
+(def isOneOff(a, b) =>
+    (def impl(idx, ac)
+        => ac = 1 ; idx = len(a)
+        => impl(idx + 1, ac + (a(idx) != b(idx))) ; 1)(0, 0)
+)
+
+' Selects and returns the two strings in the input that are off by
+' one character.
+(def selectOneOff(lists) =>
+    head(lists flatmap (def(a) =>
+        lists filter (def(b) => isOneOff(a, b))
+        map (def(b) => { a, b })))
+)
+
+(def main(args)
+    let mode(int(args(0))),
+        input(genLists(args(1)))
+    => checksum(genLists(args(1))) ; mode = 1
+    => selectOneOff(input) reduce joining "\n" ; mode = 2
+)
