@@ -1,0 +1,22 @@
+@import string using splitOn
+@import list using _
+
+' Splits the input string into an integer vect of modulations.
+def parseMods(input) => input splitOn "\n" map \int
+
+' Finds the first frequency that appears twice.
+' @param freqs a vect of frequency modulations
+' @param idx the current index into freqs
+' @param freq the current frequency
+' @param seen a map of frequencies already seen
+(def findTargetFreq(mods, idx, freq, seen)
+    => freq ; freq in seen
+    => findTargetFreq(mods, (idx + 1) % len(mods), freq + mods(idx), freq :: seen) ; 1
+)
+
+(def main(args)
+    let mode(int(args(0))),
+        mods(parseMods(args(1)))
+    => mods reduce \+\ ; mode = 1
+    => findTargetFreq(mods, 0, 0, Unit) ; mode = 2
+)
