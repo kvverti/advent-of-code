@@ -1,0 +1,42 @@
+@import string using splitOn
+@import util using until
+@import stream using Stream
+
+' Parses the string input into a vect of claim properties.
+(def parseInput(input) =>
+    input splitOn "\n"
+    map (def(s) => s splitOn "#@,:x " map \int)
+    map (def(v) => {
+        .id => v(0),
+        .x1 => v(1),
+        .y1 => v(2),
+        .x2 => v(1) + v(3),
+        .y2 => v(2) + v(4)
+    })
+)
+
+' Merge helper function.
+(def merge(map1, map2) =>
+    (map1 ++ map2) fold (Unit,
+        def(ac, k, v) => ac ++ { k => (map1(k) else {}) ++ (map2(k) else {}) }
+    )
+)
+
+' Computes the overlapping regions in the given claims.
+' The grid returned is a map of the form:
+' { x, y } => { id1, id2, ..., idn }
+' where { x, y } are the coordinates and id1..n are the ids
+' that cover this space.
+(def computeClaims(claims) =>
+    claims flatmap (def(claim) =>
+    Stream(claim.x1 until claim.x2) flatmap (def(xi) =>
+    Stream(claim.y1 until claim.y2) map (def(yi) =>
+    { { xi, yi } => { claim.id } }))) reduce \merge
+)
+
+(def main(args)
+    let mode(int(args(0))),
+        input(parseInput(args(1)))
+    => len(computeClaims input
+        filter (def(k, v) => len(v) > 1)) ; mode = 1
+)
