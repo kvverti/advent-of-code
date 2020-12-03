@@ -1,7 +1,7 @@
 -- Thalia Nero, Advent of Code 2020
 module Puzzle3 where
 
-import Control.Monad.Trans.State
+import Data.List
 
 -- Forest of width, trees
 data Forest = Forest Int [Foliage]
@@ -47,16 +47,32 @@ nextPoint (fall, run) (x, Forest w ts) = let fall' = fall * w
 -- Given the step, compute the foliage encountered along the path through the forest.
 path :: (Int, Int) -> Forest -> [Foliage]
 path step forest = let next = nextPoint step in
-                       map toTree $ takeWhile unfinished $ iterate next (0, forest)
+                       map toTree . takeWhile unfinished $ iterate' next (0, forest)
     where toTree :: (Int, Forest) -> Foliage
           toTree (x, Forest _ ts) = ts !! x
           unfinished :: (Int, Forest) -> Bool
           unfinished (x, Forest _ ts) = drop x ts /= []
 
+-- Computes how many trees are hit with the given step.
+treesHit :: (Int, Int) -> Forest -> Integer
+treesHit step forest = sum $ density <$> path step forest
+
 -- Solves part 1 of the puzzle.
 part1 :: Forest -> Integer
-part1 forest = sum $ density <$> path (1, 3) forest
+part1 = treesHit (1, 3)
+
+-- Solves part 2 of the puzzle.
+part2 :: Forest -> Integer
+part2 forest = product $ flip treesHit forest <$> slopes
+    where slopes :: [(Int, Int)]
+          slopes = [(1, 1), (1, 3), (1, 5), (1, 7), (2, 1)]
 
 main :: IO ()
-main = putStrLn =<< show . part1 . input <$> readFile "input3.txt"
-                                          
+main = do
+    putStr "Part: "
+    n <- readLn
+    forest <- input <$> readFile "input3.txt"
+    putStrLn . show $ part n forest
+    where part 1 = part1
+          part 2 = part2
+          part _ = const 0
