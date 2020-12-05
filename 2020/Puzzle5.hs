@@ -1,16 +1,12 @@
 -- Thalia Nero, Advent of Code 2020
 module Puzzle5 where
 
+import Data.List
+
 text1 :: [String]
 text1 = [ "BFFFBBFRRR"
         , "FFFBBBFRRR"
         , "BBFFBBFRLL" ]
-
-zeros :: [Char]
-zeros = "FL"
-
-ones :: [Char]
-ones = "BR"
 
 -- Gets the seat ID for a seat. Literally turning this string into a number.
 seatId :: String -> Integer
@@ -21,9 +17,25 @@ seatId = foldl1 ((+) . (*) 2) . map binary
           binary 'B' = 1
           binary 'R' = 1
 
+-- Parses input.
+input :: String -> [Integer]
+input = map seatId . lines
+
 -- Solves part 1.
-part1 :: [String] -> Integer
-part1 = foldl1 max . map seatId
+part1 :: [Integer] -> Integer
+part1 = foldl1 max
+
+-- Solves part 2.
+part2 :: [Integer] -> Integer
+part2 seats = let ids = sort seats in
+                  fst . head . dropWhile (uncurry (==)) $ zip [head ids..] ids
 
 main :: IO ()
-main = putStrLn =<< show . part1 . lines <$> readFile "input5.txt"
+main = do
+    putStr "Part: "
+    n <- readLn
+    passes <- input <$> readFile "input5.txt"
+    putStrLn . show $ part n passes
+    where part 1 = part1
+          part 2 = part2
+          part _ = const 0
