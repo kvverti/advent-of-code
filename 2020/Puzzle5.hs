@@ -1,6 +1,7 @@
 -- Thalia Nero, Advent of Code 2020
 module Puzzle5 where
 
+import AdventUtil
 import Data.List
 
 text1 :: [String]
@@ -31,11 +32,4 @@ part2 seats = let ids = sort seats in
                   fst . head . dropWhile (uncurry (==)) $ zip [head ids..] ids
 
 main :: IO ()
-main = do
-    putStr "Part: "
-    n <- readLn
-    passes <- input <$> readFile "input5.txt"
-    putStrLn . show $ part n passes
-    where part 1 = part1
-          part 2 = part2
-          part _ = const 0
+main = drive "input5.txt" input part1 part2

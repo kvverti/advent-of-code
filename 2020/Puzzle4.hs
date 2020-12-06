@@ -1,6 +1,7 @@
 -- Thalia Nero, Advent of Code 2020
 module Puzzle4 where
 
+import AdventUtil
 import Data.Ix
 import Data.List
 import Data.Maybe
@@ -96,11 +97,7 @@ keys = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"] -- no cid >:)
 
 -- Splits input string into passport data segments.
 splitEntries :: String -> [String]
-splitEntries src = unfoldr splitter $ lines src
-    where splitter :: [String] -> Maybe (String, [String])
-          splitter src = case break (== "") src of
-                              ([], _) -> Nothing
-                              (lns, src') -> Just (intercalate " " lns, dropWhile (== "") src')
+splitEntries = blocks " "
 
 -- Splits input string into passport data.
 passportDict :: String -> PassportDict
@@ -137,12 +134,5 @@ part2 :: [PassportDict] -> Int
 part2 passes = length . filter strictlyValid . catMaybes $ passport <$> passes
 
 main :: IO ()
-main = do
-    putStr "Part: "
-    n <- readLn
-    passes <- input <$> readFile "input4.txt"
-    putStrLn . show $ part n passes
-    where part 1 = part1
-          part 2 = part2
-          part _ = const 0
+main = drive "input4.txt" input part1 part2
 

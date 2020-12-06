@@ -1,6 +1,7 @@
 -- Thalia Nero, Advent of Code 2020
 module Puzzle3 where
 
+import AdventUtil
 import Data.List
 
 -- Forest of width, trees
@@ -68,11 +69,4 @@ part2 forest = product $ flip treesHit forest <$> slopes
           slopes = [(1, 1), (1, 3), (1, 5), (1, 7), (2, 1)]
 
 main :: IO ()
-main = do
-    putStr "Part: "
-    n <- readLn
-    forest <- input <$> readFile "input3.txt"
-    putStrLn . show $ part n forest
-    where part 1 = part1
-          part 2 = part2
-          part _ = const 0
+main = drive "input3.txt" input part1 part2

@@ -33,4 +33,4 @@ part2 :: [String] -> Int
 part2 xs = sum $ length . foldl1 intersect . words <$> xs
 
 main :: IO ()
-main = putStrLn =<< show . part2 . input <$> readFile "input6.txt"
+main = drive "input6.txt" input part1 part2
